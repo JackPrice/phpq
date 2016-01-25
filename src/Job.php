@@ -61,6 +61,14 @@ abstract class Job
     private $_failed = false;
 
     /**
+     * Internally used when this job is marked as finished.
+     * @internal
+     *
+     * @var boolean
+     */
+    private $_finished = false;
+
+    /**
      * Internally used to mark this job as having a result.
      * @internal
      *
@@ -206,7 +214,7 @@ abstract class Job
      */
     final protected function finish()
     {
-        // NOP - default state
+        $this->_finished = true;
 
         return $this;
     }

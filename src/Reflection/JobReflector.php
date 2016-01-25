@@ -17,6 +17,7 @@ abstract class JobReflector extends Reflector
     const PROPERTY_SCHEDULE = 'schedule';
     const PROPERTY_PARAMETERS = 'parameters';
     const PROPERTY_FAILED = '_failed';
+    const PROPERTY_FINISHED = '_finished';
     const PROPERTY_RESULT = '_result';
     const PROPERTY_HAS_RESULT = '_hasResult';
 
@@ -95,6 +96,18 @@ abstract class JobReflector extends Reflector
     public static function didFail(Job $job)
     {
         return Reflector::getProperty($job, JobReflector::PROPERTY_FAILED);
+    }
+
+    /**
+     * Returns true if the given job marked itself as finished.
+     *
+     * @param Job $job
+     *
+     * @return boolean
+     */
+    public static function didFinish(Job $job)
+    {
+        return Reflector::getProperty($job, JobReflector::PROPERTY_FINISHED);
     }
 
     /**

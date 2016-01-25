@@ -1,6 +1,7 @@
 <?php namespace PHPQ\Driver;
 
 use PHPQ\PHPQ;
+use PHPQ\Queue;
 
 /**
  * All PHPQ drivers must concretely extend this class.
@@ -46,4 +47,13 @@ abstract class AbstractDriver
      * @return string
      */
     abstract public function getName();
+
+    /**
+     * Count the number of pending jobs in the given queue.
+     *
+     * @param Queue $queue
+     *
+     * @return int
+     */
+    abstract public function countPendingJobsInQueue(Queue $queue);
 }

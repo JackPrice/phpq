@@ -5,7 +5,7 @@
  *
  * @author Jack Price <jackprice@outlook.com>
  */
-class Queue
+class Queue implements \Countable
 {
     /**
      * The PHPQ instance this queue belongs to.
@@ -31,5 +31,15 @@ class Queue
     {
         $this->phpq = &$phpq;
         $this->name = $name;
+    }
+
+    /**
+     * Returns the number of pending jobs in this queue.
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return $this->phpq->getDriver()->countPendingJobsInQueue($this);
     }
 }
