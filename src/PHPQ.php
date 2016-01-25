@@ -17,6 +17,7 @@ class PHPQ implements LoggerAwareInterface
     use LoggerAwareTrait;
 
     const VERSION = '0.1';
+    const DEFAULT_QUEUE = '_default';
 
     /**
      * The current PSR-3-compatible logger implementation.
@@ -105,5 +106,17 @@ class PHPQ implements LoggerAwareInterface
         );
 
         return $this;
+    }
+
+    /**
+     * Get a queue by its name, or the default queue if none specified.
+     *
+     * @param string $name
+     *
+     * @return Queue
+     */
+    public function getQueue($name = PHPQ::DEFAULT_QUEUE)
+    {
+        return new Queue($this, $name);
     }
 }
