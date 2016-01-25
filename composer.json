@@ -1,0 +1,22 @@
+{
+    "name": "jackprice/phpq",
+    "description": "A PHP job queuing implementation",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jack Price",
+            "email": "jackprice@outlook.com"
+        }
+    ],
+    "require": {
+
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPQ\\": "src/"
+        }
+    }
+}
