@@ -24,10 +24,10 @@ class Queue implements \Countable
     /**
      * Queue constructor.
      *
-     * @param PHPQ   $PHPQ
+     * @param PHPQ   $phpq
      * @param string $name
      */
-    public function __construct(PHPQ &$PHPQ, $name)
+    public function __construct(PHPQ &$phpq, $name)
     {
         $this->phpq = &$phpq;
         $this->name = $name;
@@ -41,5 +41,25 @@ class Queue implements \Countable
     public function count()
     {
         return $this->phpq->getDriver()->countPendingJobsInQueue($this);
+    }
+
+    /**
+     * Returns the name of this queue.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get the PHPQ instance this queue belongs to.
+     *
+     * @return PHPQ
+     */
+    public function getPHPQ()
+    {
+        return $this->phpq;
     }
 }
