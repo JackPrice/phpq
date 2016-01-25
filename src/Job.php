@@ -193,7 +193,7 @@ abstract class Job
      *
      * @return mixed
      */
-    abstract public function perform(ContainerInterface $container);
+    abstract public function perform(ContainerInterface $container = null);
 
     /**
      * Mark this job as failed.
@@ -232,5 +232,23 @@ abstract class Job
         $this->_result = $data;
 
         return $this;
+    }
+
+    /**
+     * Called before a job is run.
+     *
+     * @return void
+     */
+    public function setUp()
+    {
+        // NOP
+    }
+
+    /**
+     * Called after a job has executed - successfully or not.
+     */
+    public function tearDown()
+    {
+        // NOP
     }
 }
