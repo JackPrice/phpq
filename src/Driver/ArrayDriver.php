@@ -12,7 +12,20 @@ use PHPQ\Reflection\JobReflector;
  */
 class ArrayDriver extends AbstractDriver
 {
+    /**
+     * An array of Queues containing Jobs.
+     *
+     * @var array
+     */
     protected $queues = array();
+
+    /**
+     * Keep track of the number of jobs we have so we can assign each one a
+     * unique ID.
+     *
+     * @var int
+     */
+    protected $counter = 0;
 
     /**
      * @inheritdoc
@@ -56,5 +69,17 @@ class ArrayDriver extends AbstractDriver
         }
 
         return $this->queues[$name];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addJobToQueue(Queue $queue, Job &$job)
+    {
+        JobReflector::setId($job, $this->counter);
+
+        array_push($this->getQueue($queue->getName()), $job);
+
+        $this->counter ++;
     }
 }

@@ -1,5 +1,8 @@
 <?php namespace PHPQ;
 
+use DateTimeImmutable;
+use DateTimeInterface;
+
 /**
  * This class represents a named job queue - containing any number of jobs.
  *
@@ -61,5 +64,55 @@ class Queue implements \Countable
     public function getPHPQ()
     {
         return $this->phpq;
+    }
+
+    /**
+     * Add the given job to this queue.
+     *
+     * @param Job $job
+     *
+     * @return $this
+     */
+    public function enqueue(Job &$job)
+    {
+        $this->initialiseJobObject($job);
+
+        $this->phpq->getDriver()->addJobToQueue($this, $job);
+    }
+
+    /**
+     * Schedule the given job for future execution in this queue.
+     *
+     * @param Job                                 $job
+     * @param DateTimeImmutable $schedule
+     *
+     * @return $this
+     */
+    public function schedule(Job &$job, DateTimeImmutable $schedule)
+    {
+        $this->initialiseJobObject($job);
+
+        Reflection\JobReflector::setSchedule($job, $schedule);
+
+        $this->phpq->getDriver()->addJobToQueue($this, $job);
+    }
+
+    /**
+     * Initialise the given job object.
+     * @internal
+     *
+     * @param Job $job
+     *
+     * @return void
+     */
+    final private function initialiseJobObject(Job &$job)
+    {
+        $created = new DateTimeImmutable();
+
+        Reflection\JobReflector::setQueue($job, $this);
+        Reflection\JobReflector::setCreated($job, $created);
+        Reflection\JobReflector::setSchedule($job, $created);
+
+        return;
     }
 }

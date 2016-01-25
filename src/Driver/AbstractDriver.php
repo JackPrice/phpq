@@ -1,5 +1,6 @@
 <?php namespace PHPQ\Driver;
 
+use PHPQ\Job;
 use PHPQ\PHPQ;
 use PHPQ\Queue;
 
@@ -56,4 +57,15 @@ abstract class AbstractDriver
      * @return int
      */
     abstract public function countPendingJobsInQueue(Queue $queue);
+
+    /**
+     * Push the given job onto the queue specified.
+     * The driver is expected to initialise the ID of the job.
+     *
+     * @param Queue $queue
+     * @param Job   $job
+     *
+     * @return void
+     */
+    abstract public function addJobToQueue(Queue $queue, Job &$job);
 }
