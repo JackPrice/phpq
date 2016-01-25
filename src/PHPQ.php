@@ -1,6 +1,7 @@
 <?php namespace PHPQ;
 
 use Interop\Container\ContainerInterface;
+use PHPQ\Driver\AbstractDriver;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -30,6 +31,13 @@ class PHPQ implements LoggerAwareInterface
      * @var ContainerInterface
      */
     protected $container;
+
+    /**
+     * The current driver.
+     *
+     * @var AbstractDriver
+     */
+    protected $driver;
 
     /**
      * Get the current logger implementation (defaults to a null logger).
@@ -65,6 +73,36 @@ class PHPQ implements LoggerAwareInterface
     public function setContainer(ContainerInterface $container)
     {
         $this->container = $container;
+
+        return $this;
+    }
+
+    /**
+     * Get the current driver implementation.
+     *
+     * @return AbstractDriver
+     */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
+
+    /**
+     * Set the current driver implementation.
+     *
+     * @param AbstractDriver $driver
+     *
+     * @return $this
+     */
+    public function setDriver(AbstractDriver $driver)
+    {
+        $driver->setPHPQ($this);
+
+        $this->driver = $driver;
+
+        $this->getLogger()->debug(
+            sprintf('Added driver of type [%s]', $driver->getName())
+        );
 
         return $this;
     }
