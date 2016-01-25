@@ -131,4 +131,16 @@ class PHPQ implements LoggerAwareInterface
     {
         return new Worker($this, $queues);
     }
+
+    /**
+     * Get a job by its ID.
+     *
+     * @param $id
+     *
+     * @return null|Job
+     */
+    public function getJobById($id)
+    {
+        return $this->getDriver()->getJobById($id);
+    }
 }

@@ -150,4 +150,24 @@ class ArrayDriver extends AbstractDriver
     {
         // NOP
     }
+
+    /**
+     * Get a job by its ID.
+     *
+     * @param $id
+     *
+     * @return Job|null
+     */
+    public function getJobById($id)
+    {
+        foreach ($this->queues as &$queue) {
+            foreach ($queue as &$job) {
+                if ($job->getId() == $id) {
+                    return $job;
+                }
+            }
+        }
+
+        return null;
+    }
 }

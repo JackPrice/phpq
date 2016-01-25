@@ -116,4 +116,13 @@ abstract class AbstractDriver
      * @param mixed $result
      */
     abstract public function markJobAsFailedWithResult(Job &$job, $result);
+
+    /**
+     * Get a job by its ID.
+     *
+     * @param $id
+     *
+     * @return Job|null
+     */
+    abstract public function getJobById($id);
 }
