@@ -75,9 +75,17 @@ class Queue implements \Countable
      */
     public function enqueue(Job &$job)
     {
+        $this->getPHPQ()->getLogger()->info('Enqueuing job');
+
         $this->initialiseJobObject($job);
 
-        $this->phpq->getDriver()->addJobToQueue($this, $job);
+        $id = $this->phpq->getDriver()->addJobToQueue($this, $job);
+
+        Reflection\JobReflector::setId($job, $id);
+
+        $this->getPHPQ()->getLogger()->debug(sprintf('Enqueued job #%d', $job->getId()));
+
+        return $this;
     }
 
     /**
@@ -90,11 +98,19 @@ class Queue implements \Countable
      */
     public function schedule(Job &$job, DateTimeImmutable $schedule)
     {
+        $this->getPHPQ()->getLogger()->info('Scheduling job');
+
         $this->initialiseJobObject($job);
 
         Reflection\JobReflector::setSchedule($job, $schedule);
 
-        $this->phpq->getDriver()->addJobToQueue($this, $job);
+        $id = $this->phpq->getDriver()->addJobToQueue($this, $job);
+
+        Reflection\JobReflector::setId($job, $id);
+
+        $this->getPHPQ()->getLogger()->debug(sprintf('Scheduled job #%d', $job->getId()));
+
+        return $this;
     }
 
     /**

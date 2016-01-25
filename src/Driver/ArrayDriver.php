@@ -47,7 +47,7 @@ class ArrayDriver extends AbstractDriver
         $count = 0;
 
         foreach ($this->getQueue($queue->getName()) as $job) {
-            if (JobReflector::didFinish($job)) {
+            if (!property_exists($job, '_started')) {
                 $count ++;
             }
         }
@@ -76,10 +76,78 @@ class ArrayDriver extends AbstractDriver
      */
     public function addJobToQueue(Queue $queue, Job &$job)
     {
-        JobReflector::setId($job, $this->counter);
+        $this->getQueue($queue->getName());
 
-        array_push($this->getQueue($queue->getName()), $job);
+        array_push($this->queues[$queue->getName()], $job);
 
-        $this->counter ++;
+        return $this->counter ++;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function reserveJob(
+        $queues = null,
+        $blocking = true,
+        $timeout = 0
+    ) {
+        $firstIteration = true;
+        $end = time() + $timeout;
+
+        while (($blocking || $firstIteration) && ($timeout == 0 || time() < $end)) {
+            foreach ($this->queues as $name => &$queue) {
+                if ($queues != null && !in_array($name, $queues)) {
+                    continue;
+                }
+
+                foreach ($queue as &$job) {
+                    if (!property_exists($job, '_started')) {
+                        $job->_started = true;
+
+                        return $job;
+                    }
+                }
+            }
+
+            if ($timeout > 0) {
+                sleep (1);
+            }
+
+            $firstIteration = false;
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function markJobAsFinished(Job &$job)
+    {
+        // NOP
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function markJobAsFinishedWithResult(Job &$job, $result)
+    {
+        // NOP
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function markJobAsFailed(Job &$job)
+    {
+        // NOP
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function markJobAsFailedWithResult(Job &$job, $result)
+    {
+        // NOP
     }
 }

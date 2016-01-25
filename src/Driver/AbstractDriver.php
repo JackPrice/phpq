@@ -60,12 +60,60 @@ abstract class AbstractDriver
 
     /**
      * Push the given job onto the queue specified.
-     * The driver is expected to initialise the ID of the job.
+     * The driver is expected to initialise the ID of the job and return it.
      *
      * @param Queue $queue
      * @param Job   $job
      *
-     * @return void
+     * @return int
      */
     abstract public function addJobToQueue(Queue $queue, Job &$job);
+
+    /**
+     * Get a job from the top of the queues specified (or any if null) and mark
+     * it as started.
+     * If $blocking, this operation will not return until we
+     * have a job, or $timeout seconds have elapsed.
+     *
+     * @param null $queues
+     * @param bool $blocking
+     * @param int  $timeout
+     *
+     * @return Job|null
+     */
+    abstract public function reserveJob(
+        $queues = null,
+        $blocking = true,
+        $timeout = 0
+    );
+
+    /**
+     * Mark the given job as finished.
+     *
+     * @param Job $job
+     */
+    abstract public function markJobAsFinished(Job &$job);
+
+    /**
+     * Mark the given job as finished with the given result.
+     *
+     * @param Job   $job
+     * @param mixed $result
+     */
+    abstract public function markJobAsFinishedWithResult(Job &$job, $result);
+
+    /**
+     * Mark the given job as failed.
+     *
+     * @param Job $job
+     */
+    abstract public function markJobAsFailed(Job &$job);
+
+    /**
+     * Mark the given job as failed with the given result.
+     *
+     * @param Job   $job
+     * @param mixed $result
+     */
+    abstract public function markJobAsFailedWithResult(Job &$job, $result);
 }
