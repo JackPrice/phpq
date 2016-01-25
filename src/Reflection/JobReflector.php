@@ -99,6 +99,19 @@ abstract class JobReflector extends Reflector
     }
 
     /**
+     * Mark the given job as failed (or not failed)
+     *
+     * @param Job  $job
+     * @param bool $failed
+     */
+    public static function setFailed(Job &$job, $failed = true)
+    {
+        Reflector::setProperty($job, JobReflector::PROPERTY_FAILED, $failed);
+
+        return;
+    }
+
+    /**
      * Returns true if the given job marked itself as finished.
      *
      * @param Job $job
@@ -108,6 +121,19 @@ abstract class JobReflector extends Reflector
     public static function didFinish(Job &$job)
     {
         return Reflector::getProperty($job, JobReflector::PROPERTY_FINISHED);
+    }
+
+    /**
+     * Mark the given job as finished (or not finished)
+     *
+     * @param Job  $job
+     * @param bool $finished
+     */
+    public static function setFinished(Job &$job, $finished = true)
+    {
+        Reflector::setProperty($job, JobReflector::PROPERTY_FINISHED, $finished);
+
+        return;
     }
 
     /**
@@ -123,6 +149,19 @@ abstract class JobReflector extends Reflector
     }
 
     /**
+     * Mark the given job as having a result (or not)
+     *
+     * @param Job  $job
+     * @param bool $hasResult
+     */
+    public static function setHasResult(Job &$job, $hasResult = true)
+    {
+        Reflector::setProperty($job, JobReflector::PROPERTY_HAS_RESULT, $hasResult);
+
+        return;
+    }
+
+    /**
      * Returns the result of the job.
      *
      * @param Job $job
@@ -132,5 +171,18 @@ abstract class JobReflector extends Reflector
     public static function getResult(Job &$job)
     {
         return Reflector::getProperty($job, JobReflector::PROPERTY_RESULT);
+    }
+
+    /**
+     * Set the result of the given job.
+     *
+     * @param Job  $job
+     * @param bool $result
+     */
+    public static function setResult(Job &$job, $result = null)
+    {
+        Reflector::setProperty($job, JobReflector::PROPERTY_RESULT, $result);
+
+        return;
     }
 }

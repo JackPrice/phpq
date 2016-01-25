@@ -23,15 +23,19 @@ abstract class Reflector
     {
         $class = new ReflectionClass($object);
 
-        if (!$class->hasProperty($property)) {
-            throw new ReflectionException(
-                sprintf('Object of class [%s] has no property [%s]', get_class($object), $property)
-            );
+        while (!$class->hasProperty($property)) {
+            if (!$class = $class->getParentClass()) {
+                throw new ReflectionException(
+                    sprintf('Object of class [%s] has no property [%s]',
+                        get_class($object), $property)
+                );
+            }
         }
 
-        $class
-            ->getProperty($property)
-            ->setValue($object, $value);
+        $property = $class->getProperty($property);
+
+        $property->setAccessible(true);
+        $property->setValue($object, $value);
 
         return;
     }
@@ -49,15 +53,20 @@ abstract class Reflector
     {
         $class = new ReflectionClass($object);
 
-        if (!$class->hasProperty($property)) {
-            throw new ReflectionException(
-                sprintf('Object of class [%s] has no property [%s]', get_class($object), $property)
-            );
+        while (!$class->hasProperty($property)) {
+            if (!$class = $class->getParentClass()) {
+                throw new ReflectionException(
+                    sprintf('Object of class [%s] has no property [%s]',
+                        get_class($object), $property)
+                );
+            }
         }
 
-        return $class
-            ->getProperty($property)
-            ->getValue($object);
+        $property = $class->getProperty($property);
+
+        $property->setAccessible(true);
+
+        return $property->getValue($object);
     }
 
     /**
