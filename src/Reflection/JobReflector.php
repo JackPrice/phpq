@@ -27,7 +27,7 @@ abstract class JobReflector extends Reflector
      * @param Job $job
      * @param int $id
      */
-    public static function setId(Job $job, $id)
+    public static function setId(Job &$job, $id)
     {
         Reflector::setProperty($job, JobReflector::PROPERTY_ID, $id);
 
@@ -40,7 +40,7 @@ abstract class JobReflector extends Reflector
      * @param Job   $job
      * @param Queue $queue
      */
-    public static function setQueue(Job $job, Queue $queue)
+    public static function setQueue(Job &$job, Queue $queue)
     {
         Reflector::setProperty($job, JobReflector::PROPERTY_QUEUE, $queue);
 
@@ -53,7 +53,7 @@ abstract class JobReflector extends Reflector
      * @param Job                     $job
      * @param DateTimeImmutable $created
      */
-    public static function setCreated(Job $job, DateTimeImmutable $created)
+    public static function setCreated(Job &$job, DateTimeImmutable $created)
     {
         Reflector::setProperty($job, JobReflector::PROPERTY_CREATED, $created);
 
@@ -63,12 +63,12 @@ abstract class JobReflector extends Reflector
     /**
      * Set the schedule timestamp on the given job.
      *
-     * @param Job                     $job
-     * @param DateTimeImmutable $created
+     * @param Job               $job
+     * @param DateTimeImmutable $schedule
      */
-    public static function setSchedule(Job $job, DateTimeImmutable $created)
+    public static function setSchedule(Job &$job, DateTimeImmutable $schedule)
     {
-        Reflector::setProperty($job, JobReflector::PROPERTY_SCHEDULE, $created);
+        Reflector::setProperty($job, JobReflector::PROPERTY_SCHEDULE, $schedule);
 
         return;
     }
@@ -79,7 +79,7 @@ abstract class JobReflector extends Reflector
      * @param Job   $job
      * @param array $parameters
      */
-    public static function setParameters(Job $job, array $parameters = array())
+    public static function setParameters(Job &$job, array $parameters = array())
     {
         Reflector::setProperty($job, JobReflector::PROPERTY_PARAMETERS, $parameters);
 
@@ -93,7 +93,7 @@ abstract class JobReflector extends Reflector
      *
      * @return boolean
      */
-    public static function didFail(Job $job)
+    public static function didFail(Job &$job)
     {
         return Reflector::getProperty($job, JobReflector::PROPERTY_FAILED);
     }
@@ -105,7 +105,7 @@ abstract class JobReflector extends Reflector
      *
      * @return boolean
      */
-    public static function didFinish(Job $job)
+    public static function didFinish(Job &$job)
     {
         return Reflector::getProperty($job, JobReflector::PROPERTY_FINISHED);
     }
@@ -117,7 +117,7 @@ abstract class JobReflector extends Reflector
      *
      * @return boolean
      */
-    public static function hasResult(Job $job)
+    public static function hasResult(Job &$job)
     {
         return Reflector::getProperty($job, JobReflector::PROPERTY_HAS_RESULT);
     }
@@ -129,7 +129,7 @@ abstract class JobReflector extends Reflector
      *
      * @return mixed
      */
-    public static function getResult(Job $job)
+    public static function getResult(Job &$job)
     {
         return Reflector::getProperty($job, JobReflector::PROPERTY_RESULT);
     }

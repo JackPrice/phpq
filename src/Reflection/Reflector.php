@@ -19,7 +19,7 @@ abstract class Reflector
      *
      * @throws ReflectionException
      */
-    public static function setProperty($object, $property, $value)
+    public static function setProperty(&$object, $property, $value)
     {
         $class = new ReflectionClass($object);
 
@@ -45,7 +45,7 @@ abstract class Reflector
      * @return mixed
      * @throws ReflectionException
      */
-    public static function getProperty($object, $property)
+    public static function getProperty(&$object, $property)
     {
         $class = new ReflectionClass($object);
 
@@ -69,7 +69,7 @@ abstract class Reflector
      * @return object
      * @throws ReflectionException
      */
-    public static function mutateClass($object, $target)
+    public static function mutateClass(&$object, $target)
     {
         if (!is_subclass_of($object, $target)) {
             throw new ReflectionException(
