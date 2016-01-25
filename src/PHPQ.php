@@ -119,4 +119,16 @@ class PHPQ implements LoggerAwareInterface
     {
         return new Queue($this, $name);
     }
+
+    /**
+     * Get a worker for the specified queues, or all queues if not specified.
+     *
+     * @param null|string[] $queues
+     *
+     * @return Worker
+     */
+    public function getWorker($queues = null)
+    {
+        return new Worker($this, $queues);
+    }
 }
