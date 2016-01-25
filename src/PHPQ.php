@@ -1,5 +1,6 @@
 <?php namespace PHPQ;
 
+use Interop\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -24,6 +25,13 @@ class PHPQ implements LoggerAwareInterface
     protected $logger;
 
     /**
+     * A container used for passing objects and services to jobs.
+     *
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
      * Get the current logger implementation (defaults to a null logger).
      *
      * @return LoggerInterface
@@ -35,5 +43,29 @@ class PHPQ implements LoggerAwareInterface
         }
 
         return $this->logger;
+    }
+
+    /**
+     * Get the current container implementation.
+     *
+     * @return ContainerInterface
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
+     * Set the current container implementation.
+     *
+     * @param ContainerInterface $container
+     *
+     * @return $this
+     */
+    public function setContainer(ContainerInterface $container)
+    {
+        $this->container = $container;
+
+        return $this;
     }
 }
