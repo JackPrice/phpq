@@ -55,6 +55,20 @@ class PHPQ implements LoggerAwareInterface
     }
 
     /**
+     * Set the current logger implementation.
+     *
+     * @param LoggerInterface $logger
+     *
+     * @return $this
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
+    /**
      * Get the current container implementation.
      *
      * @return ContainerInterface
