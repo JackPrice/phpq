@@ -20,13 +20,6 @@ class PHPQ implements LoggerAwareInterface
     const DEFAULT_QUEUE = '_default';
 
     /**
-     * The current PSR-3-compatible logger implementation.
-     *
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * A container used for passing objects and services to jobs.
      *
      * @var ContainerInterface
@@ -52,20 +45,6 @@ class PHPQ implements LoggerAwareInterface
         }
 
         return $this->logger;
-    }
-
-    /**
-     * Set the current logger implementation.
-     *
-     * @param LoggerInterface $logger
-     *
-     * @return $this
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-
-        return $this;
     }
 
     /**
