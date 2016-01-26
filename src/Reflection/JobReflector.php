@@ -1,5 +1,6 @@
 <?php namespace PHPQ\Reflection;
 
+use DateTime;
 use DateTimeImmutable;
 use PHPQ\Job;
 use PHPQ\Queue;
@@ -61,6 +62,18 @@ abstract class JobReflector extends Reflector
     }
 
     /**
+     * Get the created timestamp on the given job.
+     *
+     * @param Job $job
+     *
+     * @return DateTimeImmutable
+     */
+    public static function getCreated(Job &$job)
+    {
+        return Reflector::getProperty($job, JobReflector::PROPERTY_CREATED);
+    }
+
+    /**
      * Set the schedule timestamp on the given job.
      *
      * @param Job               $job
@@ -74,6 +87,18 @@ abstract class JobReflector extends Reflector
     }
 
     /**
+     * Get the schedule timestamp on the given job.
+     *
+     * @param Job $job
+     *
+     * @return DateTimeImmutable
+     */
+    public static function getSchedule(Job &$job)
+    {
+        return Reflector::getProperty($job, JobReflector::PROPERTY_SCHEDULE);
+    }
+
+    /**
      * Set the parameters on the given job.
      *
      * @param Job   $job
@@ -84,6 +109,18 @@ abstract class JobReflector extends Reflector
         Reflector::setProperty($job, JobReflector::PROPERTY_PARAMETERS, $parameters);
 
         return;
+    }
+
+    /**
+     * Get the parameters on the given job.
+     *
+     * @param Job $job
+     *
+     * @return array
+     */
+    public static function getParameters(Job &$job)
+    {
+        return Reflector::getProperty($job, JobReflector::PROPERTY_PARAMETERS);
     }
 
     /**
@@ -184,5 +221,50 @@ abstract class JobReflector extends Reflector
         Reflector::setProperty($job, JobReflector::PROPERTY_RESULT, $result);
 
         return;
+    }
+
+    /**
+     * Convert the given job to JSON.
+     *
+     * @param Job $job
+     *
+     * @return string
+     */
+    public static function toJSON(Job &$job)
+    {
+        return json_encode(array(
+            '__CLASS__' => get_class($job),
+            'created' => JobReflector::getCreated($job)->getTimestamp(),
+            'schedule' => JobReflector::getSchedule($job)->getTimestamp(),
+            'parameters' => JobReflector::getParameters($job),
+        ));
+    }
+
+    /**
+     * Convert json to a job.
+     *
+     * @param $json
+     *
+     * @return Job
+     */
+    public static function fromJSON($json)
+    {
+        $data = json_decode($json, true);
+
+        $class = $data['__CLASS__'];
+
+        $job = new $class();
+
+        JobReflector::setCreated($job,
+            (new DateTimeImmutable())->setTimestamp($data['created'])
+        );
+        JobReflector::setSchedule($job,
+            (new DateTimeImmutable())->setTimestamp($data['schedule'])
+        );
+        if (is_array($data['parameters'])) {
+            JobReflector::setParameters($job, $data['parameters']);
+        }
+
+        return $job;
     }
 }
