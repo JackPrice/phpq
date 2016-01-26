@@ -128,6 +128,8 @@ class Queue implements \Countable
         Reflection\JobReflector::setQueue($job, $this);
         Reflection\JobReflector::setCreated($job, $created);
         Reflection\JobReflector::setSchedule($job, $created);
+        Reflection\JobReflector::setTimeout($job, null);
+        Reflection\JobReflector::setVersion($job, 0);
 
         return;
     }

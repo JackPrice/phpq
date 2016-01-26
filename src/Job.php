@@ -1,5 +1,7 @@
 <?php namespace PHPQ;
 
+use DateInterval;
+use DateTime;
 use DateTimeImmutable;
 use Interop\Container\ContainerInterface;
 
@@ -64,9 +66,9 @@ abstract class Job
      * Internally used when this job is marked as finished.
      * @internal
      *
-     * @var boolean
+     * @var DateTimeImmutable
      */
-    private $_finished = false;
+    private $_finished = null;
 
     /**
      * Internally used to mark this job as having a result.
@@ -83,6 +85,65 @@ abstract class Job
      * @var mixed
      */
     private $_result = null;
+
+    /**
+     * Internally used to store whether we should retry this job.
+     *
+     * @var int
+     */
+    private $_retry = false;
+
+    /**
+     * Internally used to store the number of times this job has been retried.
+     *
+     * @var int
+     */
+    private $_retryCount = 0;
+
+    /**
+     * Internally used to store the period of time to wait before retrying this
+     * job.
+     *
+     * @var DateInterval
+     */
+    private $_retryAfter = null;
+
+    /**
+     * Internally used to store whether this job has been deferred until a later
+     * time.
+     *
+     * @var boolean
+     */
+    private $_deferred = false;
+
+    /**
+     * Internally used to store when this job has been deferred until.
+     *
+     * @var DateTimeImmutable
+     */
+    private $_deferredUntil = null;
+
+    /**
+     * Internally used to store when this job was last attempted.
+     *
+     * @var null|DateTimeImmutable
+     */
+    private $_lastAttempt = null;
+
+    /**
+     * Internally used to determine when execution of this job will timeout.
+     *
+     * @var null|DateTimeImmutable
+     */
+    private $_timeout = null;
+
+    /**
+     * Internally used for locking - keeps track of whether other processes have
+     * accessed this job.
+     *
+     * @var int
+     */
+    private $_version = 0;
 
     /**
      * Returns the globally-unique ID of this job.
@@ -214,7 +275,7 @@ abstract class Job
      */
     final protected function finish()
     {
-        $this->_finished = true;
+        $this->_finished = new DateTimeImmutable();
 
         return $this;
     }
@@ -235,6 +296,91 @@ abstract class Job
     }
 
     /**
+     * Mark this job as being unavailable to be retried.
+     *
+     * @return $this
+     */
+    final protected function withoutRetry()
+    {
+        $this->_retry = false;
+
+        return $this;
+    }
+
+    /**
+     * Mark this job as being unavailable to be retried.
+     *
+     * @return $this
+     */
+    final protected function thenRetry()
+    {
+        $this->_retry = true;
+
+        return $this;
+    }
+
+    /**
+     * Get the number of times this job has been retried.
+     *
+     * @return int
+     */
+    final public function getRetryCount()
+    {
+        return $this->_retryCount;
+    }
+
+    /**
+     * Mark this job to be retried after the specified interval.
+     *
+     * @param DateInterval $interval
+     *
+     * @return $this
+     * @throws Exception
+     */
+    final protected function after(DateInterval $interval)
+    {
+        if (!$this->_retry) {
+            throw new Exception('Called after() without thenRetry()');
+        }
+
+        $this->_retryAfter = $interval;
+
+        return $this;
+    }
+
+    /**
+     * Mark this job as deferred until the specified time.
+     *
+     * @param DateTimeImmutable $when
+     *
+     * @return $this
+     */
+    final protected function deferUntil(DateTimeImmutable $when)
+    {
+        $this->_deferred = true;
+        $this->_deferredUntil = $when;
+
+        return $this;
+    }
+
+    /**
+     * Mark this job as deferred for the specified interval
+     *
+     * @param DateInterval $interval
+     *
+     * @return $this
+     */
+    final protected function deferFor(DateInterval $interval)
+    {
+        $when = DateTimeImmutable::createFromMutable((new DateTime())->add($interval));
+
+        $this->_deferred = true;
+        $this->_deferredUntil = $when;
+
+        return $this;
+    }
+
+    /**
      * Called before a job is run.
      *
      * @return void
@@ -250,5 +396,17 @@ abstract class Job
     public function tearDown()
     {
         // NOP
+    }
+
+    /**
+     * Returns the default amount of time to wait before execution of this job
+     * times-out.
+     *
+     * @return DateInterval
+     */
+    public function getDefaultTimeoutInterval()
+    {
+        // Fifteen (15) minutes by default
+        return new DateInterval('PT15M');
     }
 }

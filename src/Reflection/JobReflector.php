@@ -1,6 +1,5 @@
 <?php namespace PHPQ\Reflection;
 
-use DateTime;
 use DateTimeImmutable;
 use PHPQ\Job;
 use PHPQ\Queue;
@@ -21,6 +20,12 @@ abstract class JobReflector extends Reflector
     const PROPERTY_FINISHED = '_finished';
     const PROPERTY_RESULT = '_result';
     const PROPERTY_HAS_RESULT = '_hasResult';
+    const PROPERTY_RETRY = '_retry';
+    const PROPERTY_RETRY_COUNT = '_retryCount';
+    const PROPERTY_LAST_ATTEMPT = '_lastAttempt';
+    const PROPERTY_PROGRESS = '_progress';
+    const PROPERTY_TIMEOUT = '_timeout';
+    const PROPERTY_VERSION = '_version';
 
     /**
      * Set the ID on the given job.
@@ -157,6 +162,18 @@ abstract class JobReflector extends Reflector
      */
     public static function didFinish(Job &$job)
     {
+        return Reflector::getProperty($job, JobReflector::PROPERTY_FINISHED) !== null;
+    }
+
+    /**
+     * Returns the time the job marked itself as finished
+     *
+     * @param Job $job
+     *
+     * @return DateTimeImmutable
+     */
+    public static function getFinished(Job &$job)
+    {
         return Reflector::getProperty($job, JobReflector::PROPERTY_FINISHED);
     }
 
@@ -164,9 +181,9 @@ abstract class JobReflector extends Reflector
      * Mark the given job as finished (or not finished)
      *
      * @param Job  $job
-     * @param bool $finished
+     * @param DateTimeImmutable $finished
      */
-    public static function setFinished(Job &$job, $finished = true)
+    public static function setFinished(Job &$job, DateTimeImmutable $finished = null)
     {
         Reflector::setProperty($job, JobReflector::PROPERTY_FINISHED, $finished);
 
@@ -224,47 +241,127 @@ abstract class JobReflector extends Reflector
     }
 
     /**
-     * Convert the given job to JSON.
+     * Get whether this job is marked as retry-able.
      *
-     * @param Job $job
+     * @param Job  $job
      *
-     * @return string
+     * @return bool
      */
-    public static function toJSON(Job &$job)
+    public static function getRetries(Job &$job)
     {
-        return json_encode(array(
-            '__CLASS__' => get_class($job),
-            'created' => JobReflector::getCreated($job)->getTimestamp(),
-            'schedule' => JobReflector::getSchedule($job)->getTimestamp(),
-            'parameters' => JobReflector::getParameters($job),
-        ));
+        return Reflector::getProperty($job, JobReflector::PROPERTY_RETRY);
     }
 
     /**
-     * Convert json to a job.
+     * Set the result of the given job.
      *
-     * @param $json
-     *
-     * @return Job
+     * @param Job $job
+     * @param int $retryCount
      */
-    public static function fromJSON($json)
+    public static function setRetryCount(Job &$job, $retryCount)
     {
-        $data = json_decode($json, true);
+        Reflector::setProperty($job, JobReflector::PROPERTY_RETRY_COUNT, $retryCount);
 
-        $class = $data['__CLASS__'];
+        return;
+    }
 
-        $job = new $class();
+    /**
+     * Get when this job was last attempted.
+     *
+     * @param Job $job
+     *
+     * @return null|DateTimeImmutable
+     */
+    public static function getLastAttempt(Job &$job)
+    {
+        return Reflector::getProperty($job, JobReflector::PROPERTY_LAST_ATTEMPT);
+    }
 
-        JobReflector::setCreated($job,
-            (new DateTimeImmutable())->setTimestamp($data['created'])
-        );
-        JobReflector::setSchedule($job,
-            (new DateTimeImmutable())->setTimestamp($data['schedule'])
-        );
-        if (is_array($data['parameters'])) {
-            JobReflector::setParameters($job, $data['parameters']);
-        }
+    /**
+     * Set when this job was last attempted.
+     *
+     * @param Job                    $job
+     * @param DateTimeImmutable|null $lastAttempt
+     */
+    public static function setLastAttempt(Job &$job, DateTimeImmutable $lastAttempt = null)
+    {
+        Reflector::setProperty($job, JobReflector::PROPERTY_LAST_ATTEMPT, $lastAttempt);
 
-        return $job;
+        return;
+    }
+
+    /**
+     * Get the progress of this job.
+     *
+     * @param Job\HasProgress|Job $job
+     *
+     * @return float
+     */
+    public static function getProgress(Job\HasProgress &$job)
+    {
+        return Reflector::getProperty($job, JobReflector::PROPERTY_PROGRESS);
+    }
+
+    /**
+     * Set the progress of this job.
+     *
+     * @param Job\HasProgress|Job $job
+     * @param float               $progress
+     */
+    public static function setProgress(Job &$job, $progress)
+    {
+        Reflector::setProperty($job, JobReflector::PROPERTY_PROGRESS, $progress);
+
+        return;
+    }
+
+    /**
+     * Get when this job's current attempt will timeout.
+     *
+     * @param Job $job
+     *
+     * @return null|DateTimeImmutable
+     */
+    public static function getTimeout(Job &$job)
+    {
+        return Reflector::getProperty($job, JobReflector::PROPERTY_TIMEOUT);
+    }
+
+    /**
+     * Set when this job's current attempt will timeout.
+     *
+     * @param Job $job
+     * @param DateTimeImmutable|null $timeout
+     */
+    public static function setTimeout(Job &$job, DateTimeImmutable $timeout = null)
+    {
+        Reflector::setProperty($job, JobReflector::PROPERTY_TIMEOUT, $timeout);
+
+        return;
+    }
+
+    /**
+     * Get this job's version number.
+     *
+     * @param Job $job
+     *
+     * @return int
+     */
+    public static function getVersion(Job &$job)
+    {
+        return Reflector::getProperty($job, JobReflector::PROPERTY_VERSION);
+    }
+
+    /**
+     * Set this job's version number.
+     *
+     * @param Job $job
+     * @param int $version
+     */
+    public static function setVersion(Job &$job, $version)
+    {
+        Reflector::setProperty($job, JobReflector::PROPERTY_VERSION, $version);
+
+        return;
     }
 }

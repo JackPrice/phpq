@@ -88,34 +88,26 @@ abstract class AbstractDriver
     );
 
     /**
-     * Mark the given job as finished.
+     * Persist the given jobs state.
      *
      * @param Job $job
      */
-    abstract public function markJobAsFinished(Job &$job);
+    abstract public function persistJobState(Job &$job);
 
     /**
-     * Mark the given job as finished with the given result.
-     *
-     * @param Job   $job
-     * @param mixed $result
-     */
-    abstract public function markJobAsFinishedWithResult(Job &$job, $result);
-
-    /**
-     * Mark the given job as failed.
+     * Report to this driver that we are finished with the given job.
      *
      * @param Job $job
      */
-    abstract public function markJobAsFailed(Job &$job);
+    abstract public function detach(Job &$job);
 
     /**
-     * Mark the given job as failed with the given result.
+     * Report the progress from 0 - 100 for this job.
      *
      * @param Job   $job
-     * @param mixed $result
+     * @param float $progress
      */
-    abstract public function markJobAsFailedWithResult(Job &$job, $result);
+    abstract public function reportJobProgress(Job &$job, $progress);
 
     /**
      * Get a job by its ID.
@@ -125,4 +117,13 @@ abstract class AbstractDriver
      * @return Job|null
      */
     abstract public function getJobById($id);
+
+    /**
+     * This function will be called to set up the queueing system for first-use.
+     * It can be used to perform database schema creation etc.
+     */
+    public function performInitialSetup()
+    {
+        //
+    }
 }

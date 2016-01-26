@@ -83,50 +83,20 @@ class Worker
         $this->getPHPQ()->getLogger()->info(sprintf('Running job #%d', $job->getId()));
 
         JobReflector::setFailed($job, false);
-        JobReflector::setFinished($job, false);
+        JobReflector::setFinished($job, null);
         JobReflector::setHasResult($job, false);
         JobReflector::setResult($job, null);
 
         try {
             $job->setUp();
             $job->perform($this->getPHPQ()->getContainer());
+            $job->tearDown();
         } catch (\Exception $e) {
             JobReflector::setFailed($job, true);
-        } finally {
-            $job->tearDown();
-
-            if (JobReflector::didFinish($job) && JobReflector::hasResult($job)) {
-                $this->getPHPQ()->getLogger()->info(sprintf('Job #%d finished with result', $job->getId()));
-
-                $this->getPHPQ()
-                    ->getDriver()
-                    ->markJobAsFinishedWithResult($job, JobReflector::getResult($job));
-            } elseif (JobReflector::didFinish($job)) {
-                $this->getPHPQ()->getLogger()->info(sprintf('Job #%d finished', $job->getId()));
-
-                $this->getPHPQ()
-                    ->getDriver()
-                    ->markJobAsFinished($job);
-            } elseif (JobReflector::didFail($job) && JobReflector::hasResult($job)) {
-                $this->getPHPQ()->getLogger()->info(sprintf('Job #%d failed with result', $job->getId()));
-
-                $this->getPHPQ()
-                    ->getDriver()
-                    ->markJobAsFailedWithResult($job, JobReflector::getResult($job));
-            } elseif (JobReflector::didFail($job)) {
-                $this->getPHPQ()->getLogger()->info(sprintf('Job #%d failed', $job->getId()));
-
-                $this->getPHPQ()
-                    ->getDriver()
-                    ->markJobAsFailed($job);
-            } else {
-                $this->getPHPQ()->getLogger()->error(sprintf('Job #%d finished with undetermined state', $job->getId()));
-
-                $this->getPHPQ()
-                    ->getDriver()
-                    ->markJobAsFailed($job);
-            }
         }
+
+        $this->getPHPQ()->getDriver()->persistJobState($job);
+        $this->getPHPQ()->getDriver()->detach($job);
 
         return;
     }
